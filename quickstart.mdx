@@ -1,47 +1,67 @@
 ---
 title: "Quickstart"
-description: "Begin with a guide on the fastest path to a successful outcome"
+description: "Authenticate and make your first Morabaa Public API request."
 ---
 
-Describe how someone begins using your product. What is the first thing they need to do? Are there any prerequisites?
-
-A quickstart should take someone from zero to using your product. They'll get a quick win and a sense of what they can accomplish.
+Use this guide to retrieve products with your API key.
 
 ## Prerequisites
 
-Before you begin, you must have:
+Before you begin, you need:
 
-- Requirement one (for example, Node.js 18+, a free account, an API key)
-- Requirement two (for example, a compatible device, a compatible browser, a compatible operating system)
+- The API base URL supplied by Morabaa
+- An API key with the `products:list` scope
+- A tool that can send HTTP requests, such as cURL
 
-## Get started
+<Warning>
+  Store your API key like a password. Morabaa displays its plaintext value only when staff create or rotate it.
+</Warning>
+
+## Make a request
 
 <Steps>
-  <Step title="Install">
-    Describe how to install your product or sign up.
+  <Step title="Set your credentials">
+    Replace the placeholders with the values supplied by Morabaa.
 
     ```bash
-    npm install your-package
+    export MORABAA_API_URL="https://your-api-host.example"
+    export MORABAA_API_KEY="mrb_yourprefix_yoursecret"
     ```
   </Step>
-  <Step title="Configure">
-    Describe any setup or configuration needed before first use.
+  <Step title="List products">
+    Send your key in the `X-Api-Key` header.
 
     ```bash
-    your-cli init
+    curl --request GET \
+      --url "$MORABAA_API_URL/external/v1/products?page=1" \
+      --header "X-Api-Key: $MORABAA_API_KEY"
     ```
   </Step>
-  <Step title="Run it">
-    Show the first thing a user does to see it working.
+  <Step title="Read the response">
+    A successful request returns the first 25 products in a paginated response.
 
-    ```bash
-    your-cli start
+    ```json
+    {
+      "items": [],
+      "page": 1,
+      "pageSize": 25,
+      "total": 0
+    }
     ```
   </Step>
 </Steps>
 
-<Tip>
-  Give people a way to get help. This could be a link to a support page, a chat with a customer support agent, or a forum for your product.
+<Check>
+  Your integration is authenticated when the API returns a `200` response. A `401` response means the key is missing, malformed, inactive, revoked, expired, or incorrect.
+</Check>
 
-  Example: Need help? Reach out to us at [support@yourcompany.com](mailto:support@yourcompany.com).
-</Tip>
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Filter products" icon="filter" href="/api-reference/products">
+    Search by category, brand, barcode, SKU, or availability.
+  </Card>
+  <Card title="Create an order" icon="cart-plus" href="/api-reference/orders">
+    Submit customer, item, and delivery details.
+  </Card>
+</CardGroup>

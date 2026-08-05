@@ -1,0 +1,62 @@
+---
+title: "Authentication and scopes"
+description: "Authenticate Morabaa Public API requests and grant only the scopes your integration needs."
+---
+
+Every external request requires a scoped API key. Your key identifies one Morabaa business and determines which operations your integration can perform.
+
+## Send an API key
+
+Use either supported header. Do not send both.
+
+<CodeGroup>
+```http X-Api-Key
+X-Api-Key: mrb_<prefix>_<secret>
+```
+
+```http Authorization
+Authorization: Api-Key mrb_<prefix>_<secret>
+```
+</CodeGroup>
+
+Keys follow this format:
+
+```text
+mrb_<10-character base62 prefix>_<43-character base62 secret>
+```
+
+<Warning>
+  Never commit a key to source control or expose it in client-side code. Store it in a server-side secret manager or environment variable.
+</Warning>
+
+## Key lifecycle
+
+A key works only while it is active, unexpired, not revoked, and not deleted. Morabaa stores a SHA-256 hash of the full key rather than its plaintext value.
+
+The plaintext key is available once after creation or rotation. If you lose it, ask Morabaa staff to rotate the token. Rotation immediately invalidates the previous key.
+
+## Scopes
+
+Request only the scopes your integration needs.
+
+| Scope | Allows |
+| --- | --- |
+| `products:list` | Search and list products |
+| `products:find` | Retrieve one product by ID |
+| `orders:list` | List orders created with the current key |
+| `orders:find` | Retrieve one order created with the current key |
+| `orders:create` | Create an order |
+
+If your key lacks an endpoint's required scope, the API returns `403` using the [standard error format](/api-reference/errors).
+
+## Business and order isolation
+
+The API resolves the business from your authenticated token. A request parameter cannot switch your integration to another business.
+
+For order reads, the API also verifies that the order:
+
+- belongs to your key's business;
+- has `ApiKey` as its source; and
+- was created with your current token ID.
+
+This prevents one key from reading storefront orders or orders created by another key for the same business.

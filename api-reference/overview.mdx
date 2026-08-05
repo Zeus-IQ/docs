@@ -1,0 +1,45 @@
+---
+title: "API overview"
+description: "Review Morabaa Public API endpoints, required scopes, and pagination conventions."
+---
+
+All partner endpoints begin with `/external/v1` and require an [API key](/authentication).
+
+## Endpoints
+
+| Method | Route | Required scope | Description |
+| --- | --- | --- | --- |
+| `GET` | `/external/v1/products` | `products:list` | Search and filter products |
+| `GET` | `/external/v1/products/{id}` | `products:find` | Retrieve a product by GUID |
+| `GET` | `/external/v1/orders` | `orders:list` | List orders created through the current key |
+| `GET` | `/external/v1/orders/{orderNumberOrId}` | `orders:find` | Retrieve an order by number or ID |
+| `POST` | `/external/v1/orders` | `orders:create` | Create an order attributed to the current key |
+
+## Pagination
+
+List endpoints accept a one-based `page` query parameter and return 25 items per page. Values below `1` are treated as `1`.
+
+```json
+{
+  "items": [],
+  "page": 1,
+  "pageSize": 25,
+  "total": 0
+}
+```
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `items` | array | Resources on the current page |
+| `page` | integer | Current one-based page number |
+| `pageSize` | integer | Fixed number of items per page |
+| `total` | integer | Total matching resources |
+
+<CardGroup cols={2}>
+  <Card title="Products" icon="box" href="/api-reference/products">
+    Search the catalog or retrieve a product by ID.
+  </Card>
+  <Card title="Orders" icon="receipt" href="/api-reference/orders">
+    Create orders and retrieve orders created by your key.
+  </Card>
+</CardGroup>

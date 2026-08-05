@@ -1,0 +1,37 @@
+---
+title: "Errors and rate limits"
+description: "Handle Morabaa Public API errors and per-key request limits."
+---
+
+Every external API failure uses the same JSON shape.
+
+```json
+{
+  "error": "machine_readable_code",
+  "message": "Human-readable explanation"
+}
+```
+
+Use `error` for programmatic handling. Use `message` when logging or displaying context to an operator.
+
+## HTTP statuses
+
+| Status | Meaning |
+| --- | --- |
+| `400` | The request is invalid or order creation failed |
+| `401` | The key is missing, malformed, inactive, revoked, expired, or incorrect |
+| `403` | The key lacks the required scope |
+| `404` | The product or permitted order was not found |
+| `429` | The key's request limit was exceeded |
+| `500` | An unexpected server error occurred |
+| `503` | The store is under maintenance |
+
+## Rate limits
+
+Rate limits use a fixed one-minute window for each API token. A key can have a custom requests-per-minute limit. Otherwise, the server uses its configured default, with a fallback of 60 requests per minute.
+
+When the limit is exceeded, the API rejects the request without queuing it and returns `429`. Read the `Retry-After` response header before retrying.
+
+<Tip>
+  Use exponential backoff for transient `429` and `500` responses. Do not retry validation failures or missing-scope errors without changing the request or key.
+</Tip>

@@ -1,0 +1,48 @@
+---
+title: "Manage API tokens"
+description: "Create, update, rotate, revoke, and delete Morabaa Public API tokens."
+---
+
+<Info>
+  These endpoints are restricted to Morabaa staff. They use staff authentication rather than partner API-key authentication.
+</Info>
+
+## Endpoints
+
+| Method | Route | Description |
+| --- | --- | --- |
+| `POST` | `/admin/api-tokens` | Create a token and reveal its key once |
+| `GET` | `/admin/api-tokens/scopes` | List grantable scopes and descriptions |
+| `GET` | `/admin/api-tokens?businessId={id}` | List tokens, optionally filtered by business |
+| `GET` | `/admin/api-tokens/{id}` | Retrieve token metadata |
+| `PATCH` | `/admin/api-tokens/{id}` | Partially update a token |
+| `POST` | `/admin/api-tokens/{id}/rotate` | Replace the secret and reveal the new key once |
+| `POST` | `/admin/api-tokens/{id}/revoke` | Permanently revoke and deactivate a token |
+| `DELETE` | `/admin/api-tokens/{id}` | Soft-delete a token |
+
+## Create a token
+
+A valid create request requires:
+
+- a non-empty business ID;
+- a non-blank name;
+- at least one valid scope; and
+- a rate limit of at least `1` when supplied.
+
+Duplicate scopes are removed before the token is stored. The create response is the only response that exposes the plaintext `key`.
+
+## Update a token
+
+The `PATCH` contract applies only non-null values. A blank `Name` is ignored.
+
+<Note>
+  `RateLimitPerMinute` and `ExpiresAt` can be assigned, but the current endpoint cannot clear either field back to `null`.
+</Note>
+
+## Rotate, revoke, or delete
+
+- **Rotate** replaces the key prefix and hash. The previous key stops working immediately, and the response reveals the new plaintext key once.
+- **Revoke** sets the revocation timestamp and deactivates the token permanently.
+- **Delete** soft-deletes the token and preserves its database row.
+
+Normal token metadata never includes `Key` or `KeyHash`.

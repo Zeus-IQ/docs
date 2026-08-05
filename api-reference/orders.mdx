@@ -1,0 +1,71 @@
+---
+title: "Orders"
+description: "Create and retrieve orders through the Morabaa Public API."
+---
+
+Order reads return only orders created through the current API key. They do not expose storefront orders or orders created by another key.
+
+## Create an order
+
+`POST /external/v1/orders` requires the `orders:create` scope.
+
+```bash
+curl --request POST \
+  --url "$MORABAA_API_URL/external/v1/orders" \
+  --header "Content-Type: application/json" \
+  --header "X-Api-Key: $MORABAA_API_KEY" \
+  --data '{
+    "customerName": "Ahmed Ali",
+    "customerPhone": "+9647700000000",
+    "note": "Leave at reception",
+    "items": [
+      {
+        "productId": "11111111-1111-1111-1111-111111111111",
+        "combinationId": null,
+        "quantity": 2
+      }
+    ],
+    "address": {
+      "lineOne": "Street 1",
+      "city": "Baghdad",
+      "country": "Iraq",
+      "phone": "+9647700000000"
+    }
+  }'
+```
+
+### Request requirements
+
+- `customerName` must not be blank.
+- `customerPhone` must not be blank.
+- `items` must contain at least one item.
+- Every item needs a non-empty `productId` and a `quantity` greater than zero.
+- `address.phone` falls back to `customerPhone` when omitted.
+
+The API reuses an existing customer ID when the phone number matches. Otherwise, it generates a customer ID while retaining the submitted customer details on the order.
+
+<Warning>
+  You cannot create an order while the store is under maintenance. The API returns `503`.
+</Warning>
+
+## List orders
+
+`GET /external/v1/orders` requires the `orders:list` scope. It accepts optional `query` and `page` parameters.
+
+```bash
+curl --request GET \
+  --url "$MORABAA_API_URL/external/v1/orders?page=1" \
+  --header "X-Api-Key: $MORABAA_API_KEY"
+```
+
+## Find an order
+
+`GET /external/v1/orders/{orderNumberOrId}` requires the `orders:find` scope. Use either the order number or ID.
+
+```bash
+curl --request GET \
+  --url "$MORABAA_API_URL/external/v1/orders/ORDER-1001" \
+  --header "X-Api-Key: $MORABAA_API_KEY"
+```
+
+The API returns `404` when the order does not exist or the current key is not permitted to read it.

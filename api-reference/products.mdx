@@ -1,0 +1,44 @@
+---
+title: "Products"
+description: "Search, filter, and retrieve products through the Morabaa Public API."
+---
+
+Use the product endpoints to synchronize a catalog or look up current product details. Responses omit internal values such as buy price.
+
+## List products
+
+`GET /external/v1/products` requires the `products:list` scope.
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `query` | string | No | General product search |
+| `page` | integer | No | One-based page number; values below `1` become `1` |
+| `isAvailable` | boolean | No | Filters by availability |
+| `categoryIds` | comma-separated GUIDs | No | Filters by category IDs |
+| `brandIds` | comma-separated GUIDs | No | Filters by brand IDs |
+| `barcode` | string | No | Filters by barcode |
+| `sku` | string | No | Filters by SKU |
+
+Malformed values in `categoryIds` and `brandIds` are ignored.
+
+```bash
+curl --request GET \
+  --url "$MORABAA_API_URL/external/v1/products?query=coffee&isAvailable=true&page=1" \
+  --header "X-Api-Key: $MORABAA_API_KEY"
+```
+
+## Product prices
+
+The `price` field contains the sale or list price. The `sellPrice` field contains the effective price after an active discount, when a discount applies.
+
+## Find a product
+
+`GET /external/v1/products/{id}` requires the `products:find` scope. Pass the product GUID in the route.
+
+```bash
+curl --request GET \
+  --url "$MORABAA_API_URL/external/v1/products/11111111-1111-1111-1111-111111111111" \
+  --header "X-Api-Key: $MORABAA_API_KEY"
+```
+
+The API returns `404` when the product is not found for the key's business.
